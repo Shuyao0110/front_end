@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<input type="text">
+<button>btn</button>
+
+<body>
+    <script>
+
+        function debounce(fn, delay, immediate = true, resultCallback) {
+            //维护一个计时器，用来记录被监听事件的执行时间
+            let timer = null;
+            //第一次输入之前唤醒为false
+            let isInvoke = false;
+            //声明返回值
+            let res = undefined;
+
+            let _debounce = (...args) => {
+                //计时器归零
+                if (timer) clearTimeout(timer);
+
+                //立即执行，每次防抖完成之后的第一次输入不延迟
+                if (immediate && !isInvoke) {
+                    res = fn.apply(this, args) //获取返回值
+                    if (resultCallback) resultCallback(res)//回调返回值函数
+                    isInvoke = true;
+                    return;
+                }
+                //重新开启计时器
+                timer = setTimeout(() => {
+                    res = fn.apply(this, args)
+                    //apply第一个参数是绑定对象，第二个参数是其他对象
+                    //绑定了this，调用时才会绑定输入框的输入事件，否则是独立调用，指向window
+                    if (resultCallback) resultCallback(res)
+                    timer = null;
+                    isInvoke = false;
+                }, delay)
+
+                _debounce.cancel = function () {
+                    if (timer) clearTimeout(timer)
+                    timer = null;
+                    isInvoke = false;//把唤醒设置为初始值
+                }
+            }
+            return _debounce
+        }
+
+        //用包装好的防抖函数包装输入事件，作为其回调函数
+        let counter = 1;
+        const inputEL = document.querySelector('input')
+        const debounceFn = debounce(function (name, age, height) {
+            console.log(name, age, height)
+            return "coderwhy hhh"
+        }, 1000, false, function (res) {
+            console.log('获取返回值', res);
+        })
+        inputEL.oninput = debounceFn('why', 18, 188);
+
+        const btn = document.querySelector('button')
+        btn.onclick = function () {
+            debounceFn.cancel()
+        }
+
+    </script>
+</body>
+
+</html>
