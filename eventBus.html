@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button class="nav_btn">nav</button>
+    <script>
+
+        class HYEventBus {
+            constructor() {
+                this.events = {}
+                //每个HYEventBus实例内部都有一个events的属性，
+                //events里面存放各种写好的事件,作为公用的事件中心
+            }
+
+            //添加监听
+            on(eventName, eventFn) {
+                //先在events里寻找相应的事件
+                let eventFns = this.events[eventName]
+                //如果没找到,则在events里添加这个新的eventFn（以数组的形式，这样可以添加多个事件）
+                if (!eventFns) {
+                    eventFns = [];
+                    this.events[eventName] = eventFns
+                }
+                //在相应的事件的对象里添加事件
+                eventFns.push(eventFn)
+            }
+
+            //发出事件
+            emit(eventName, ...args) {
+                let eventFns = this.events[eventName]
+                if (!eventFns) return
+                //对于eventFns数组里的元素进行遍历，回调里面的每个事件
+                eventFns.forEach(fn => {
+                    fn(args);
+                })
+            }
+
+            //取消监听
+            off(eventName, eventFn) {
+                let eventFns = this.events[eventName]
+                if (!eventFns) return
+                for (let i = 0; i < eventFns.length; i++) {
+                    const fn = eventFns[i]
+                    if (fn === eventFn) {
+                        eventFns.splice(i, 1)//在第i位删除一个元素
+                        break;
+                    }
+                }
+                //清除空的eventFns
+                if (eventFns.length === 0) {
+                    delete this.events[eventName]
+                }
+            }
+        }
+
+        const eventBus = new eventBus()
+        eventBus.on('navclick', () => {
+            console.log('navigator listener 01')
+        })
+        eventBus.on('navclick', () => {
+            console.log('navigator listener 02')
+        })
+
+        const navbtn1 = document.querySelector('button')
+        navbtn1.onclick = function () {
+            console.log('自己监听自己')
+            eventBus.emit('navclick')
+        }
+
+    </script>
+</body>
+
+</html>
