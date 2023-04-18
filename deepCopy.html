@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        //判断对象类型是否为object
+        function isObject(value) {
+            //数据类型：null，object，function， array
+            const valueType = typeof value;
+            //返回一个boolean
+            // null为false，function和array和object都为true
+            return (value !== null) && (valueType === 'object' || valueType === 'function')
+        }
+
+        function deepCopy(originObj) {
+            //原始数据类型，直接返回
+            if (!isObject(originObj)) {
+                return originObj
+            }
+            //对象类型，创建新对象
+            const newObj = {}
+            for (const key in originObj) {
+                //递归一层一层拷贝
+                newObj[key] = deepCopy(originObj[key])
+            }
+            return newObj;
+        }
+
+    </script>
+</body>
+
+</html>
